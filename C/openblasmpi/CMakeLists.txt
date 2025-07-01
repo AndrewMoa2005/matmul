@@ -20,8 +20,18 @@ find_package(MPI REQUIRED)
 if(MPI_FOUND)
     message(STATUS "MPI_CXX_FOUND=${MPI_CXX_FOUND}")
     message(STATUS "MPI_CXX_INCLUDE_DIRS=${MPI_CXX_INCLUDE_DIRS}")
-    message(STATUS "MPI_C_INCLUDE_DIRS=${MPI_C_INCLUDE_DIRS}")
     message(STATUS "MPI_LIBRARIES=${MPI_LIBRARIES}")
+endif()
+
+# Find OpenBLAS
+find_package(OpenMP REQUIRED)
+find_package(OpenBLAS CONFIG REQUIRED)
+
+if(NOT OpenBLAS_FOUND)
+    message(FATAL_ERROR "OpenBLAS not found")
+else()
+    message(STATUS "OpenBLAS found: ${OpenBLAS_VERSION}")
+    message(STATUS "OpenBLAS include dirs: ${OpenBLAS_INCLUDE_DIRS}")
 endif()
 
 set(SRC_LIST
@@ -33,7 +43,6 @@ add_executable(${EXECUTE_FILE_NAME} ${SRC_LIST})
 
 target_include_directories(${EXECUTE_FILE_NAME}
     PRIVATE
-    ${MPI_C_INCLUDE_DIRS}
     ${MPI_CXX_INCLUDE_DIRS}
 )
 
@@ -45,6 +54,8 @@ if(MSVC)
 endif()
 
 target_link_libraries(${EXECUTE_FILE_NAME} PRIVATE
+    OpenBLAS::OpenBLAS
+    OpenMP::OpenMP_C
     ${MPI_LIBRARIES}
 )
 
