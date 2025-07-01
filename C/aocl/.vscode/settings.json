@@ -1,0 +1,6 @@
+{
+    "cmake.configureArgs": [
+        "-DAOCL_DIR=C:/Program Files/AMD/AOCL-Windows/",
+        "-DAOCL_BLAS_DATA=LP64",
+    ]
+}

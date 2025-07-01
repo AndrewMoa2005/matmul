@@ -1,0 +1,5 @@
+{
+    "cmake.configureArgs": [
+        "-DROCM_DIR=C:/Program Files/AMD/ROCm/6.2",
+    ]
+}

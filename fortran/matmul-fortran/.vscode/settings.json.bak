@@ -1,0 +1,6 @@
+{
+    "cmake.configureArgs": [
+        "-DCMAKE_Fortran_COMPILER=C:/Program Files (x86)/Intel/oneAPI/compiler/2025.1/bin/ifx.exe",
+        "-DCMAKE_Fortran_FLAGS=-static-intel -qopenmp -qopenmp-link=static",
+    ],
+}
