@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.13)
 get_filename_component(CURRENT_DIR ${CMAKE_CURRENT_LIST_FILE} DIRECTORY)
 get_filename_component(FOLDER_NAME ${CURRENT_DIR} NAME)
 message(STATUS "FOLDER_NAME: ${FOLDER_NAME}")
-project(${FOLDER_NAME} LANGUAGES C)
+project(${FOLDER_NAME} LANGUAGES C CXX)
 message(STATUS "PROJECT_NAME: ${PROJECT_NAME}")
 set(CMAKE_C_STANDARD 11)
 
@@ -20,7 +20,6 @@ find_package(MPI REQUIRED)
 if(MPI_FOUND)
     message(STATUS "MPI_CXX_FOUND=${MPI_CXX_FOUND}")
     message(STATUS "MPI_CXX_INCLUDE_DIRS=${MPI_CXX_INCLUDE_DIRS}")
-    message(STATUS "MPI_C_INCLUDE_DIRS=${MPI_C_INCLUDE_DIRS}")
     message(STATUS "MPI_LIBRARIES=${MPI_LIBRARIES}")
 endif()
 
@@ -34,7 +33,6 @@ add_executable(${EXECUTE_FILE_NAME} ${SRC_LIST})
 target_include_directories(${EXECUTE_FILE_NAME}
     PRIVATE
     ${MPI_CXX_INCLUDE_DIRS}
-    ${MPI_C_INCLUDE_DIRS}
 )
 
 # set static linking for MSVC

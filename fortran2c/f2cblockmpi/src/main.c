@@ -48,12 +48,10 @@ int mpi_float(int dim, int loop_num, double *ave_gflops, double *max_gflops, dou
     double cpu_time, total_cpu_time;
 
     // 计算每个进程处理的行数
-    int rows_per_process = dim / size;
+    // 确保总行数等于dim
+    int base_rows = dim / size;
     int remainder = dim % size;
-    if (rank < remainder)
-    {
-        rows_per_process++;
-    }
+    int rows_per_process = (rank < remainder) ? (base_rows + 1) : base_rows;
 
     for (int i = 0; i < loop_num; i++)
     {
@@ -112,10 +110,12 @@ int mpi_float(int dim, int loop_num, double *ave_gflops, double *max_gflops, dou
         int offset = 0;
         for (int p = 0; p < size; p++)
         {
-            sendcounts[p] = (p < remainder) ? (rows_per_process * dim) : ((rows_per_process - 1) * dim);
+            int rows = (p < remainder) ? (base_rows + 1) : base_rows;
+            sendcounts[p] = rows * dim;
             displs[p] = offset;
             offset += sendcounts[p];
         }
+
         MPI_Scatterv(a, sendcounts, displs, MPI_FLOAT, local_A, rows_per_process * dim, MPI_FLOAT, 0, MPI_COMM_WORLD);
 
         // 所有进程都需要完整的矩阵 B
@@ -159,7 +159,18 @@ int mpi_float(int dim, int loop_num, double *ave_gflops, double *max_gflops, dou
         float *c = NULL;
         if (rank == 0)
         {
-            c = (float *)malloc(dim * dim * sizeof(float));
+            // 严格校验总数据量
+            int total_recv = 0;
+            for (int p = 0; p < size; p++)
+            {
+                total_recv += sendcounts[p];
+            }
+            if (total_recv != dim * dim)
+            {
+                fprintf(stderr, "FATAL: 总数据量不匹配 %d != %d\n", total_recv, dim * dim);
+                MPI_Abort(MPI_COMM_WORLD, 1);
+            }
+            c = (float *)malloc(total_recv * sizeof(float));
             if (c == NULL)
             {
                 fprintf(stderr, "Memory allocation failed for c matrix\n");
@@ -213,12 +224,10 @@ int mpi_double(int dim, int loop_num, double *ave_gflops, double *max_gflops, do
     double cpu_time, total_cpu_time;
 
     // 计算每个进程处理的行数
-    int rows_per_process = dim / size;
+    // 确保总行数等于dim
+    int base_rows = dim / size;
     int remainder = dim % size;
-    if (rank < remainder)
-    {
-        rows_per_process++;
-    }
+    int rows_per_process = (rank < remainder) ? (base_rows + 1) : base_rows;
 
     for (int i = 0; i < loop_num; i++)
     {
@@ -277,10 +286,12 @@ int mpi_double(int dim, int loop_num, double *ave_gflops, double *max_gflops, do
         int offset = 0;
         for (int p = 0; p < size; p++)
         {
-            sendcounts[p] = (p < remainder) ? (rows_per_process * dim) : ((rows_per_process - 1) * dim);
+            int rows = (p < remainder) ? (base_rows + 1) : base_rows;
+            sendcounts[p] = rows * dim;
             displs[p] = offset;
             offset += sendcounts[p];
         }
+
         MPI_Scatterv(a, sendcounts, displs, MPI_DOUBLE, local_A, rows_per_process * dim, MPI_DOUBLE, 0, MPI_COMM_WORLD);
 
         // 所有进程都需要完整的矩阵 B
@@ -324,7 +335,18 @@ int mpi_double(int dim, int loop_num, double *ave_gflops, double *max_gflops, do
         double *c = NULL;
         if (rank == 0)
         {
-            c = (double *)malloc(dim * dim * sizeof(double));
+            // 严格校验总数据量
+            int total_recv = 0;
+            for (int p = 0; p < size; p++)
+            {
+                total_recv += sendcounts[p];
+            }
+            if (total_recv != dim * dim)
+            {
+                fprintf(stderr, "FATAL: 总数据量不匹配 %d != %d\n", total_recv, dim * dim);
+                MPI_Abort(MPI_COMM_WORLD, 1);
+            }
+            c = (double *)malloc(total_recv * sizeof(double));
             if (c == NULL)
             {
                 fprintf(stderr, "Memory allocation failed for c matrix\n");

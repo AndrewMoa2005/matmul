@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.13)
 get_filename_component(CURRENT_DIR ${CMAKE_CURRENT_LIST_FILE} DIRECTORY)
 get_filename_component(FOLDER_NAME ${CURRENT_DIR} NAME)
 message(STATUS "FOLDER_NAME: ${FOLDER_NAME}")
-project(${FOLDER_NAME} LANGUAGES C)
+project(${FOLDER_NAME} LANGUAGES C CXX)
 message(STATUS "PROJECT_NAME: ${PROJECT_NAME}")
 set(CMAKE_C_STANDARD 11)
 
